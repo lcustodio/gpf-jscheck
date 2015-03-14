@@ -1,0 +1,29 @@
+############
+## Windows
+############
+
+# Windows image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+# NPM
+node_modules/
+
+# Temporary folder
+
+tmp/*
+
+#############
+## WebStorm
+#############
+
+.idea
+
+#############
+## Make
+#############
+
+make/tmp/*
+make/build/*
