@@ -8,5 +8,4 @@ created and maintained by
 ## Features
 
 ## Credits
-* Based on [GPF Library](https://github.com/ArnaudBuchholz/gpf-js)
-* Code analysis based on [esprima](http://esprima.org/)
+* JavaScript parser: [esprima](http://esprima.org/)
