@@ -66,6 +66,11 @@
                         // Remove starting separator
                         filterPart = filterPart.substr(1);
                     }
+                    if (!filterPart) {
+                        // **
+                        lastPos =  currentPath.lastIndexOf(sep) - 1;
+                        return true;
+                    }
                     if (-1 === filterPart.indexOf(sep)) {
                         // No separator, we should match the file name
                         if (lastPos !== currentPath.lastIndexOf(sep) + 1) {
@@ -79,7 +84,12 @@
                     lastPos = pos + filterPart.length;
                     return -1 !== pos; // stop if not found
                 })) {
-                    result = match;
+                    if (lastPos === currentPath.length) {
+                        // reached the end
+                        result = match;
+                    } else {
+                        result = false;
+                    }
                     return false; // stop
                 }
             }
@@ -144,13 +154,42 @@
 
     //endregion
 
+    //region End of processing
+
+    function _end() {
+        _gpfEventsFire(exports.EVENT_DONE, {
+            infos: _infos,
+            warnings: _warnings,
+            errors: _errors
+        }, _eventsHandler);
+    }
+
+    //endregion
+
     //region Source processing
 
     var
         _currentSource,
         _currentAst,
+        _infos = [],
         _warnings = [],
         _errors = [];
+
+    /**
+     * info implementation
+     *
+     * @param {String} message
+     * @private
+     */
+    function _info (message) {
+        var line = _currentAst.loc.start.line;
+        _infos.push({
+            source: _currentSource,
+            line: line,
+            message: message
+        });
+        console.log(_currentSource + ":" + line + ": (?) " + message);
+    }
 
     /**
      * warning implementation
@@ -165,7 +204,7 @@
             line: line,
             message: message
         });
-        console.warn(_currentSource + ":" + line + ": WARNING " + message);
+        console.warn(_currentSource + ":" + line + ": /!\\ " + message);
     }
 
     /**
@@ -181,7 +220,7 @@
             line: line,
             message: message
         });
-        console.error(_currentSource + ":" + line + ": ERROR " + message);
+        console.error(_currentSource + ":" + line + ": [X] " + message);
     }
 
     /**
@@ -193,6 +232,8 @@
     function _children (ast) {
         if (ast.type === "ExpressionStatement") {
             return ast.expression;
+        } else if (ast.type === "AssignmentExpression") {
+            return [ast.left, ast.right];
         } else if (ast.type === "CallExpression") {
             return ast.callee;
             // ignore arguments
@@ -210,26 +251,36 @@
      */
     function _walk(ast, ancestors) {
         var
-            children,
-            len,
-            idx;
+            key,
+            noChildFound,
+            subAst;
+        // Apply the rules
         _currentAst = ast;
         _rules.forEach(function (rule) {
             if (rule.match(ast)) {
-                rule.test(ast, ancestors);
+                try {
+                    rule.test(ast, ancestors);
+                } catch (e) {
+                    _error("An exception occured while processing rule '"
+                        + rule.rule + "': " + e.message);
+                }
             }
         });
-        children = _children(ast);
-        if (children) {
-            ancestors.unshift(ast);
-            if (children instanceof Array) {
-                len = children.length;
-                for (idx = 0; idx < len; ++idx) {
-                    _walk(children[idx], ancestors);
+        // Explore the AST structure
+        noChildFound = true;
+        for (key in ast) {
+            if (ast.hasOwnProperty(key)) {
+                subAst = ast[key];
+                if (subAst && "object" === typeof subAst) {
+                    if (noChildFound) {
+                        ancestors.unshift(ast);
+                        noChildFound = false;
+                    }
+                    _walk(subAst, ancestors);
                 }
-            } else {
-                _walk(children, ancestors);
             }
+        }
+        if (!noChildFound) {
             ancestors.shift();
         }
     }
@@ -242,10 +293,7 @@
      */
     function _processSource(event) {
         if ("done" === event.type) {
-            _gpfEventsFire(exports.EVENT_DONE, {
-                warnings: _warnings,
-                errors: _errors
-            }, _eventsHandler);
+            _end();
 
         } else if ("file" === event.type) {
             var path = event.get("path"),
@@ -310,11 +358,17 @@
      */
     function _processRule(event) {
         if ("done" === event.type) {
-            // Process sources
-            global.warning = _warning;
-            global.error = _error;
-            global.getChildrenOfAST = _children;
-            _fsForEach(".", _config.files, _processSource);
+            if (0 === _rules.length) {
+                console.log("No rule.");
+                _end();
+            } else {
+                // Process sources
+                global.info = _info;
+                global.warning = _warning;
+                global.error = _error;
+                global.getChildrenOfAST = _children;
+                _fsForEach(".", _config.files, _processSource);
+            }
 
         } else if ("file" === event.type) {
             var path = event.get("path"),
