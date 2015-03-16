@@ -1,7 +1,9 @@
 "use strict";
 /*global process*/
-var jsCheck = require("./gpf-jscheck.js");
-var configProvider = require("./jscheck.config.js");
+var
+    path = require("path"),
+    jsCheck = require("./gpf-jscheck.js"),
+    configProvider = require(path.join(process.cwd(), "jscheck.config.js"));
 configProvider(jsCheck);
 jsCheck.run(function (event){
     if (event.type === jsCheck.EVENT_DONE) {
