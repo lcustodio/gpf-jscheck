@@ -41,13 +41,17 @@ rule("About AJAX calls", function () {
             if (!checked) {
                 error("Missing error / complete handler");
             }
-            var parent = ancestors[0],
-                children,
+
+
+            //Check instructions after ajax declaration.
+            var parent = ancestors[1], //one level up...
+                children = [],
                 pos;
-            if (parent.type === "ExpressionStatement") {
-                parent = ancestors[1];
-            }
-            children = getChildrenOfAST(parent);
+
+            parent.forEach(function(element){
+                children.push(getChildrenOfAST(element));
+            });
+
             pos = children.indexOf(ast);
             if (pos < children.length - 1) {
                 warning("Instruction found after $.ajax");
