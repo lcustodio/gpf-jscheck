@@ -24,7 +24,10 @@
     "url": "https://github.com/ArnaudBuchholz/gpf-jscheck/issues"
   },
   "dependencies": {
-    "esprima" : "2.1.0 - 2.9999.9999"
+    "esprima": "2.1.0 - 2.9999.9999"
   },
-  "homepage": "http://gpf-js.blogspot.com/"
+  "homepage": "http://gpf-js.blogspot.com/",
+  "devDependencies": {
+    "grunt": "^0.4.5"
+  }
 }
