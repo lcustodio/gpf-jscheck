@@ -8,7 +8,8 @@
         _path = require("path"),
         _esprima = require("esprima"),
         _config,
-        _eventsHandler;
+        _eventsHandler,
+        _logEventHandler;
 
     //region Helpers that will move in GPF library
 
@@ -188,7 +189,10 @@
             line: line,
             message: message
         });
-        console.log(_currentSource + ":" + line + ": (?) " + message);
+        //console.log(_currentSource + ":" + line + ": (?) " + message);
+        _gpfEventsFire(exports.EVENT_LOG_INFO, {
+            message: _currentSource + ":" + line + ": (?) " + message
+        }, _logEventHandler);
     }
 
     /**
@@ -204,7 +208,10 @@
             line: line,
             message: message
         });
-        console.warn(_currentSource + ":" + line + ": /!\\ " + message);
+        //console.warn(_currentSource + ":" + line + ": /!\\ " + message);
+        _gpfEventsFire(exports.EVENT_LOG_WARN, {
+            message: _currentSource + ":" + line + ": /!\\ " + message
+        }, _logEventHandler);
     }
 
     /**
@@ -220,7 +227,10 @@
             line: line,
             message: message
         });
-        console.error(_currentSource + ":" + line + ": [X] " + message);
+        //console.error(_currentSource + ":" + line + ": [X] " + message);
+        _gpfEventsFire(exports.EVENT_LOG_ERROR, {
+            message: _currentSource + ":" + line + ": [X] " + message
+        }, _logEventHandler);
     }
 
     /**
@@ -401,8 +411,9 @@
      *
      * @param {gpf.events.Handler} eventsHandler
      */
-    exports.run = function (eventsHandler) {
+    exports.run = function (eventsHandler, logEventHandler) {
         _eventsHandler = eventsHandler;
+        _logEventHandler = logEventHandler;
         // Starts by loading rules
         global.rule = _rule;
         global.match = _match;
@@ -410,6 +421,9 @@
     };
 
     exports.EVENT_DONE = "done";
+    exports.EVENT_LOG_INFO = "log info";
+    exports.EVENT_LOG_WARN = "log warn";
+    exports.EVENT_LOG_ERROR = "log error";
 
     //endregion
 
