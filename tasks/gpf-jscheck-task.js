@@ -1,7 +1,3 @@
-/**
- * Created by luis on 15-03-29.
- */
-
 'use strict';
 
 module.exports = function (grunt) {
@@ -14,12 +10,21 @@ module.exports = function (grunt) {
         var done = this.async();
 
         var configuration = this.options();
+
+        var gpfVerbose = (configuration.verbose === undefined) ? false : configuration.verbose;
+        var gruntVerbose = (grunt.option('verbose') === undefined) ? false : grunt.option('verbose');
+
+        configuration.verbose = gpfVerbose || gruntVerbose;
         jsCheck.initConfig(configuration);
 
         jsCheck.run(function (event){
 
             if(configuration.verbose) {
-                grunt.log.writeln("EVENT TYPE: " + event.type);
+                grunt.log.writeln(" Event type: " + event.type);
+            }
+            if(0 === event.type.indexOf("log")){
+                logEventHandling(event);
+                return;
             }
 
             if (event.type === jsCheck.EVENT_DONE) {
@@ -30,7 +35,7 @@ module.exports = function (grunt) {
                 done(true);
                 grunt.log.ok("No validation errors. Code is safe.");
             }
-        }, logEventHandling);
+        });
     });
 
     function logEventHandling(event){

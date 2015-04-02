@@ -8,8 +8,7 @@
         _path = require("path"),
         _esprima = require("esprima"),
         _config,
-        _eventsHandler,
-        _logEventHandler;
+        _eventsHandler;
 
     //region Helpers that will move in GPF library
 
@@ -189,10 +188,9 @@
             line: line,
             message: message
         });
-        //console.log(_currentSource + ":" + line + ": (?) " + message);
         _gpfEventsFire(exports.EVENT_LOG_INFO, {
             message: _currentSource + ":" + line + ": (?) " + message
-        }, _logEventHandler);
+        }, _eventsHandler);
     }
 
     /**
@@ -208,10 +206,9 @@
             line: line,
             message: message
         });
-        //console.warn(_currentSource + ":" + line + ": /!\\ " + message);
         _gpfEventsFire(exports.EVENT_LOG_WARN, {
             message: _currentSource + ":" + line + ": /!\\ " + message
-        }, _logEventHandler);
+        }, _eventsHandler);
     }
 
     /**
@@ -227,10 +224,9 @@
             line: line,
             message: message
         });
-        //console.error(_currentSource + ":" + line + ": [X] " + message);
         _gpfEventsFire(exports.EVENT_LOG_ERROR, {
             message: _currentSource + ":" + line + ": [X] " + message
-        }, _logEventHandler);
+        }, _eventsHandler);
     }
 
     /**
@@ -411,9 +407,8 @@
      *
      * @param {gpf.events.Handler} eventsHandler
      */
-    exports.run = function (eventsHandler, logEventHandler) {
+    exports.run = function (eventsHandler) {
         _eventsHandler = eventsHandler;
-        _logEventHandler = logEventHandler;
         // Starts by loading rules
         global.rule = _rule;
         global.match = _match;
