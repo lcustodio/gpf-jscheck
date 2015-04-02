@@ -18,11 +18,12 @@ rule("About AJAX calls", function () {
         },
         function (ast, ancestors) {
             var
-                callbackObj = ast.arguments[1],
+                callbackObj,
                 len,
                 idx,
                 property,
                 checked = false;
+            callbackObj = (ast.arguments.length > 1) ? ast.arguments[1] : ast.arguments[0];
             if (callbackObj.type === "ObjectExpression") {
                 len = callbackObj.properties.length;
                 for (idx = 0; idx < len; ++idx) {

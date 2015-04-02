@@ -33,7 +33,7 @@ module.exports = function (grunt) {
                     return(false);
                 }
                 done(true);
-                grunt.log.ok("No validation errors. Code is safe.");
+                grunt.log.ok("... No critical validation errors.");
             }
         });
     });
