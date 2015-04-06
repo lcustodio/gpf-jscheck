@@ -17,7 +17,7 @@ describe('Array', function(){
 
             jsCheck.initConfig({
                 verbose: true,
-                files: [ "ajax-tests.js" ],
+                files: [ "ajax-scenario1.js" ],
                 rules: [ rulePath ]
                 //rules: [ "/rules/About AJAX calls.js" ]
             });
