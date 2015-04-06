@@ -138,6 +138,7 @@
                         }
                     });
                 } else {
+                    console.log("FOUND ONE FILE -> " + currentPath);
                     if (_fsMatch(currentPath, filters)) {
                         _gpfEventsFire("file", {
                             path: currentPath
@@ -256,6 +257,9 @@
      * @param {Array} parents
      */
     function _walk(ast, ancestors) {
+
+        console.log("*******Walking! - Rules are: " + _rules);
+
         var
             key,
             noChildFound,
@@ -412,6 +416,9 @@
         // Starts by loading rules
         global.rule = _rule;
         global.match = _match;
+
+        console.log("CONFIG RULES" + JSON.stringify(_config.rules));
+
         _fsForEach(".", _config.rules, _processRule);
     };
 

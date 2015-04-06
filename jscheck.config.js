@@ -7,7 +7,7 @@ module.exports = function(jsCheck) {
             "/test/*.js"
         ],
         rules: [
-            "/test/rules/*.js"
+            "/rules/*.js"
         ]
     });
 

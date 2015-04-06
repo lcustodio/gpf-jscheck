@@ -10,7 +10,7 @@ module.exports = function(grunt) {
                     "/test/*.js"
                 ],
                 rules: [
-                    "/test/rules/*.js"
+                    "/rules/*.js"
                 ]
             },
             check:{}
