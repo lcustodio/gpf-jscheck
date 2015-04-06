@@ -188,7 +188,9 @@
             line: line,
             message: message
         });
-        console.log(_currentSource + ":" + line + ": (?) " + message);
+        _gpfEventsFire(exports.EVENT_LOG_INFO, {
+            message: _currentSource + ":" + line + ": (?) " + message
+        }, _eventsHandler);
     }
 
     /**
@@ -204,7 +206,9 @@
             line: line,
             message: message
         });
-        console.warn(_currentSource + ":" + line + ": /!\\ " + message);
+        _gpfEventsFire(exports.EVENT_LOG_WARN, {
+            message: _currentSource + ":" + line + ": /!\\ " + message
+        }, _eventsHandler);
     }
 
     /**
@@ -220,7 +224,9 @@
             line: line,
             message: message
         });
-        console.error(_currentSource + ":" + line + ": [X] " + message);
+        _gpfEventsFire(exports.EVENT_LOG_ERROR, {
+            message: _currentSource + ":" + line + ": [X] " + message
+        }, _eventsHandler);
     }
 
     /**
@@ -410,6 +416,9 @@
     };
 
     exports.EVENT_DONE = "done";
+    exports.EVENT_LOG_INFO = "log info";
+    exports.EVENT_LOG_WARN = "log warn";
+    exports.EVENT_LOG_ERROR = "log error";
 
     //endregion
 
