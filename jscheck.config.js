@@ -4,7 +4,7 @@ module.exports = function(jsCheck) {
     jsCheck.initConfig({
         verbose: true,
         files: [
-            "/test/*.js"
+            "/test/scenarios/*.js"
         ],
         rules: [
             "/rules/*.js"
