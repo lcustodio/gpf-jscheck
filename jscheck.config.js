@@ -2,12 +2,12 @@ module.exports = function(jsCheck) {
     "use strict";
 
     jsCheck.initConfig({
-        verbose: true,
+        verbose: false,
         files: [
             "/test/scenarios/*.js"
         ],
         rules: [
-            "/rules/*.js"
+            "test/rules/*.js"
         ]
     });
 

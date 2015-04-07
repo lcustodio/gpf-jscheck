@@ -4,99 +4,15 @@
     "use strict";
 
     var
+        _gpf = require("gpf-js"),
         _fs = require("fs"),
         _path = require("path"),
         _esprima = require("esprima"),
+        _gpfEventsFire = _gpf.events.fire,
         _config,
         _eventsHandler;
 
     //region Helpers that will move in GPF library
-
-    /**
-     * Simulate gpf.events.fireEvent behavior
-     *
-     * @param {String} event event name
-     * @param {Object} [params={}] params parameter of the event (when type is a
-     * string)
-     * @param {gpf.events.Handler} eventsHandler
-     */
-    function _gpfEventsFire(event, params, eventsHandler) {
-        eventsHandler({
-            type: event,
-            scope: null,
-            get: function (name) {
-                return params[name];
-            }
-        });
-    }
-
-    /**
-     * Path matching function
-     *
-     * @param {String} currentPath
-     * @param {String[]} filters (similar to gitignore format)
-     * @private
-     */
-    function _fsMatch(currentPath, filters) {
-        var
-            result = false,
-            sep = _path.sep;
-        filters.every(function (filter) {
-            var
-                match,
-                lastPos,
-                pos;
-            match = filter.charAt(0) !== "!";
-            if (!match) {
-                filter = filter.subtr(0);
-            }
-            if (-1 === filter.indexOf("/")) {
-                if (currentPath.indexOf(filter)) {
-                    result = match;
-                    return false; // stop
-                }
-            } else {
-                // TODO improve handling of **, starting / and folders
-                filter = _path.normalize(filter).split("*");
-                lastPos = -1;
-                if (filter.every(function (filterPart) {
-                    var firstPart = -1 === lastPos
-                                    && filterPart.charAt(0) === sep;
-                    if (firstPart) {
-                        // Remove starting separator
-                        filterPart = filterPart.substr(1);
-                    }
-                    if (!filterPart) {
-                        // **
-                        lastPos =  currentPath.lastIndexOf(sep) - 1;
-                        return true;
-                    }
-                    if (-1 === filterPart.indexOf(sep)) {
-                        // No separator, we should match the file name
-                        if (lastPos !== currentPath.lastIndexOf(sep) + 1) {
-                            return false; // We didn't match the whole path
-                        }
-                    }
-                    pos = currentPath.indexOf(filterPart, lastPos);
-                    if (firstPart && 0 !== pos) {
-                        return false; // must match the beginning of the path
-                    }
-                    lastPos = pos + filterPart.length;
-                    return -1 !== pos; // stop if not found
-                })) {
-                    if (lastPos === currentPath.length) {
-                        // reached the end
-                        result = match;
-                    } else {
-                        result = false;
-                    }
-                    return false; // stop
-                }
-            }
-            return true; // loop
-        });
-        return result;
-    }
 
     /**
      * Find and identify files matching the pattern, trigger a file event
@@ -112,7 +28,9 @@
      */
     function _fsForEach(basePath, filters, eventsHandler) {
         var
-            pendingCount = 0;
+            pendingCount = 0,
+            match = _gpf.path.match;
+        filters = _gpf.path.compileMatchPattern(filters);
         function _explore(currentPath) {
             ++pendingCount;
             _fs.stat(currentPath, function (err, stat) {
@@ -134,18 +52,18 @@
                             }
                         }
                         if (0 === --pendingCount) {
-                            _gpfEventsFire("done", null, eventsHandler);
+                            _gpfEventsFire("done", eventsHandler);
                         }
                     });
                 } else {
-                    if (_fsMatch(currentPath, filters)) {
+                    if (match(filters, currentPath)) {
                         _gpfEventsFire("file", {
                             path: currentPath
                         }, eventsHandler);
                     }
                 }
                 if (0 === --pendingCount) {
-                    _gpfEventsFire("done", null, eventsHandler);
+                    _gpfEventsFire("done", eventsHandler);
                 }
             });
         }
@@ -416,9 +334,9 @@
     };
 
     exports.EVENT_DONE = "done";
-    exports.EVENT_LOG_INFO = "log info";
-    exports.EVENT_LOG_WARN = "log warn";
-    exports.EVENT_LOG_ERROR = "log error";
+    exports.EVENT_LOG_INFO = "logInfo";
+    exports.EVENT_LOG_WARN = "logWarn";
+    exports.EVENT_LOG_ERROR = "logError";
 
     //endregion
 
