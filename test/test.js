@@ -1,7 +1,6 @@
 "use strict";
 var assert = require("assert");
 var jsCheck = require("../gpf-jscheck.js");
-var path = require("path");
 
 describe('Array', function(){
 
@@ -12,14 +11,10 @@ describe('Array', function(){
 
         it('should return 1 error when the call has 1 problem', function(done){
 
-            //var rulePath = path.join(process.cwd(), "../rules/AboutAJAXCalls.js");
-            //console.log("rule path: " + rulePath);
-
             jsCheck.initConfig({
                 verbose: true,
                 files: [ "scenarios/ajax-scenario1.js" ],
-                //rules: [ rulePath ]
-                rules: [ ".........//*/**../../../../rules/AboutAJAXCalls.js" ]
+                rules: [ "rules/AboutAJAXCalls.js" ]
             });
 
             jsCheck.run(function (event){
