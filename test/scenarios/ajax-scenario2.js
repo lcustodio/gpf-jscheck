@@ -4,10 +4,19 @@
     /*global $, freezeInterface, updateInterfaceUsingData, unfreezeInterface*/
     /*global showError*/
 
-    function onClick () {
+    function onTabClick () {
         freezeInterface("Please wait, updating information...");
-        $.ajax("getInformation.aspx", {
-            success: function (data) {  // error -> Here the keyword should be complete | error
+
+
+        $.ajax({
+            url: "getInformation.aspx",
+            type: 'GET',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Content-Type", "application/json");
+            },
+            dataType: 'json',
+            minLength: 3,
+            success: function (data) {
                 var resultCode = data.resultCode;
                 if (resultCode === 0) {
                     updateInterfaceUsingData(data);
@@ -17,10 +26,9 @@
                 }
             }
         });
-        unfreezeInterface();    // warning -> This function call shouldn't be here, due to the ajax async call.
     }
 
-    document.getElementById("myButton")
-        .addEventListener("click", onClick);
+    document.getElementById("myTab")
+        .addEventListener("click", onTabClick);
 
 })();

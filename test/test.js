@@ -1,35 +1,73 @@
 "use strict";
 var assert = require("assert");
-var jsCheck = require("../gpf-jscheck.js");
+var jsCheckBase = require("../gpf-jscheck.js");
+var extend = require('util')._extend;
+//var _ = require('underscore');
+var _und = require("underscore");
 
-describe('Array', function(){
+var jsCheck = _und.clone(jsCheckBase);
+var context = {jsCheck: jsCheck};
+//var jsCheck1 = _und.clone(jsCheckBase);
+
+describe('Test Suite', function(){
 
     //todo check if it's necessary to unbind jscheck and set again.
     //jscheck.delete
 
     describe('Ajax calls assertions', function(){
 
-        it('should return 1 error when the call has 1 problem', function(done){
+        beforeEach(function () {
+            //jsCheck = _und.clone(jsCheckBase);
+            context.jsCheck = _und.clone(jsCheckBase);
+        });
 
-            jsCheck.initConfig({
+        it('should return 2 issues when ajax calls miss complete and has async warning', function(done){
+
+            //var jsCheck = jsCheckBase.clone();
+            //var jsCheck = require("../gpf-jscheck.js");
+            //this.jsCheck = jsCheckBase;
+
+            //var jsCheck = extend({}, jsCheckBase);
+            //var jsCheck = _und.clone(jsCheckBase);
+            context.jsCheck.initConfig({
                 verbose: true,
                 files: [ "scenarios/ajax-scenario1.js" ],
                 rules: [ "rules/AboutAJAXCalls.js" ]
             });
 
-            jsCheck.run(function (event){
-                if (event.type === jsCheck.EVENT_DONE) {
+            context.jsCheck.run(function (event){
+                if (event.type === context.jsCheck.EVENT_DONE) {
                     assert.equal(1, event.get('errors').length);
+                    assert.equal(1, event.get('warnings').length);
                     done();
                 }
             });
         });
 
+        it('should return 1 error when ajax miss complete', function(done){
 
+            //var jsCheck = jsCheckBase.clone();
+            //jsCheck.delete();
+            //var jsCheck = require("../gpf-jscheck.js");
+            //var jsCheck = jsCheckBase;
+            //var jsCheck1 = extend({}, jsCheckBase);
+            //var jsCheck1 = _und.clone(jsCheckBase);
+            context.jsCheck.initConfig({
+                verbose: false,
+                files: [ "scenarios/ajax-scenario2.js" ],
+                rules: [ "rules/AboutAJAXCalls.js" ]
+            });
 
-        //it.skip('...example', function(){
-        //    assert.equal(1, [1,2,3].indexOf(5));
-        //    assert.equal(-1, [1,2,3].indexOf(0));
-        //});
+            context.jsCheck.run(function (event){
+                if (event.type === context.jsCheck.EVENT_DONE) {
+                    assert.equal(1, event.get('errors').length, JSON.stringify(event.get('errors')));
+                    done();
+                }
+            });
+        });
+
+        afterEach(function(){
+            delete context.jsCheck;
+        })
     })
 });
