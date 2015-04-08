@@ -7,10 +7,10 @@ module.exports = function(grunt) {
             options: {
                 verbose: false,
                 files: [
-                    "/test/scenarios/*.js"
+                    "test/scenarios/*.js"
                 ],
                 rules: [
-                    "/rules/*.js"
+                    "test/rules/*.js"
                 ]
             },
             check:{}
