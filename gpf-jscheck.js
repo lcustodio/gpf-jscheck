@@ -318,9 +318,6 @@
      */
     exports.initConfig= function (configuration) {
         _config = configuration;
-        //_infos = [];
-        //_warnings = [];
-        //_errors = [];
     };
 
     /**
